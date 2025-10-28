@@ -1,65 +1,270 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect, useCallback, useRef } from "react";
+import TestSettings from "@/components/TestSettings";
+import TypingArea from "@/components/TypingArea";
+import Results from "@/components/Results";
+import TimerDisplay from "@/components/TimerDisplay";
+import { getRandomWords } from "@/data/words";
+import { calculateResults } from "@/utils/calculations";
+import { TestState, TestMode, TestResults } from "@/types";
 
 export default function Home() {
+  const [settings, setSettings] = useState({
+    mode: "time" as TestMode,
+    duration: 30,
+    wordCount: 25,
+  });
+
+  const [testState, setTestState] = useState<TestState>(() => {
+    const words = typeof window !== "undefined" ? getRandomWords(200) : [];
+    return {
+      status: "idle",
+      currentWordIndex: 0,
+      typedText: "",
+      startTime: null,
+      endTime: null,
+      words,
+      correctChars: 0,
+      incorrectChars: 0,
+      correctWords: Array(words.length).fill(false),
+    };
+  });
+
+  const [results, setResults] = useState<TestResults | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleTestEnd = useCallback(() => {
+    setTestState((prev) => {
+      const finalState: TestState = {
+        ...prev,
+        status: "finished",
+        endTime: Date.now(),
+      };
+      setResults(calculateResults(finalState));
+      return finalState;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (
+      testState.status === "running" &&
+      settings.mode === "time" &&
+      testState.startTime
+    ) {
+      const interval = setInterval(() => {
+        const elapsed = (Date.now() - testState.startTime!) / 1000;
+
+        if (elapsed >= settings.duration) {
+          handleTestEnd();
+        }
+      }, 100);
+
+      return () => clearInterval(interval);
+    }
+  }, [
+    testState.status,
+    testState.startTime,
+    settings.mode,
+    settings.duration,
+    handleTestEnd,
+  ]);
+
+  const createInitialState = (): TestState => {
+    const words = getRandomWords(200);
+    return {
+      status: "idle",
+      currentWordIndex: 0,
+      typedText: "",
+      startTime: null,
+      endTime: null,
+      words,
+      correctChars: 0,
+      incorrectChars: 0,
+      correctWords: Array(words.length).fill(false),
+    };
+  };
+
+  const startTest = () => {
+    const words = getRandomWords(200);
+    setTestState({
+      ...createInitialState(),
+      status: "running",
+      words,
+      correctWords: Array(words.length).fill(false),
+      startTime: Date.now(),
+    });
+    setResults(null);
+    inputRef.current?.focus();
+  };
+
+  const resetTest = () => {
+    setTestState(createInitialState());
+    setResults(null);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Tab" && e.shiftKey) {
+      e.preventDefault();
+      resetTest();
+    }
+
+    if (e.key === "Escape") {
+      resetTest();
+    }
+  };
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (testState.status !== "running") {
+      startTest();
+      return;
+    }
+
+    const inputValue = e.target.value;
+    const currentWord = testState.words[testState.currentWordIndex];
+    const lastChar = inputValue[inputValue.length - 1];
+
+    if (lastChar === " ") {
+      const trimmedInput = inputValue.trim();
+      const isCorrect = trimmedInput === currentWord;
+
+      const wordLength = currentWord.length;
+      const correctChars = isCorrect ? wordLength : 0;
+      const incorrectChars = isCorrect ? 0 : wordLength;
+
+      setTestState((prev) => {
+        const newCorrectWords = [...prev.correctWords];
+        newCorrectWords[prev.currentWordIndex] = isCorrect;
+
+        const nextIndex = prev.currentWordIndex + 1;
+
+        return {
+          ...prev,
+          currentWordIndex: nextIndex,
+          typedText: "",
+          correctChars: prev.correctChars + correctChars,
+          incorrectChars: prev.incorrectChars + incorrectChars,
+          correctWords: newCorrectWords,
+        };
+      });
+
+      e.target.value = "";
+
+      setTimeout(() => {
+        setTestState((prev) => {
+          const nextIndex = prev.currentWordIndex;
+          if (settings.mode === "words" && nextIndex >= settings.wordCount) {
+            const finalState: TestState = {
+              ...prev,
+              status: "finished",
+              endTime: Date.now(),
+            };
+            setResults(calculateResults(finalState));
+            return finalState;
+          }
+          return prev;
+        });
+      }, 0);
+    } else {
+      setTestState((prev) => ({ ...prev, typedText: inputValue }));
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="min-h-screen bg-gray-900 text-white py-12">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-2">Amharic Typing Test</h1>
+          <p className="text-gray-400">ፍጥነቱን ለመፈተኽ ተጉዘይ</p>
+        </div>
+
+        {testState.status === "idle" && (
+          <div className="mb-8">
+            <TestSettings
+              mode={settings.mode}
+              duration={settings.duration}
+              wordCount={settings.wordCount}
+              onModeChange={(mode) =>
+                setSettings((prev) => ({ ...prev, mode }))
+              }
+              onDurationChange={(duration) =>
+                setSettings((prev) => ({ ...prev, duration }))
+              }
+              onWordCountChange={(wordCount) =>
+                setSettings((prev) => ({ ...prev, wordCount }))
+              }
+            />
+            <button
+              onClick={startTest}
+              className="mx-auto block bg-yellow-500 text-black font-semibold px-8 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              Start Test
+            </button>
+          </div>
+        )}
+
+        {(testState.status === "running" || testState.status === "idle") && (
+          <>
+            <TypingArea
+              words={testState.words}
+              currentWordIndex={testState.currentWordIndex}
+              typedText={testState.typedText}
+              correctWords={testState.correctWords}
+            />
+
+            <div className="mt-8 text-center">
+              <input
+                ref={inputRef}
+                type="text"
+                autoFocus
+                onInput={handleInput}
+                onKeyDown={handleKeyDown}
+                value={testState.typedText}
+                onChange={() => {}}
+                className="absolute opacity-0 pointer-events-none"
+                tabIndex={-1}
+              />
+              {testState.status === "idle" && (
+                <p className="text-gray-500 text-sm">
+                  Click Start Test to begin
+                </p>
+              )}
+              {testState.status === "running" &&
+                settings.mode === "time" &&
+                testState.startTime && (
+                  <TimerDisplay
+                    startTime={testState.startTime}
+                    duration={settings.duration}
+                  />
+                )}
+              {testState.status === "running" && settings.mode === "words" && (
+                <p className="text-2xl font-bold">
+                  {testState.currentWordIndex} / {settings.wordCount}
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
+        {testState.status === "finished" && results && (
+          <Results
+            results={results}
+            onRestart={() => {
+              resetTest();
+              setTimeout(() => startTest(), 50);
+            }}
+          />
+        )}
+
+        <div className="mt-12 text-center text-sm text-gray-500">
+          <p>
+            Press{" "}
+            <kbd className="bg-gray-800 px-2 py-1 rounded">Tab + Enter</kbd> to
+            restart | <kbd className="bg-gray-800 px-2 py-1 rounded">Esc</kbd>{" "}
+            to reset
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
