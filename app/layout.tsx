@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_Ethiopic } from "next/font/google";
 import "./globals.css";
+import { TypingTestProvider } from "@/contexts/TypingTestContext";
 
 const notoSansEthiopic = Noto_Sans_Ethiopic({
   variable: "--font-amharic",
@@ -21,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="am" dir="ltr">
       <body className={`${notoSansEthiopic.variable} antialiased`}>
-        {children}
+        <TypingTestProvider>{children}</TypingTestProvider>
       </body>
     </html>
   );

@@ -1,20 +1,12 @@
 "use client";
 
 import WordDisplay from "./WordDisplay";
+import { useTypingTestState } from "@/contexts/TypingTestContext";
 
-interface TypingAreaProps {
-  words: string[];
-  currentWordIndex: number;
-  typedText: string;
-  correctWords: (boolean | undefined)[];
-}
+export default function TypingArea() {
+  const testState = useTypingTestState();
+  const { words, currentWordIndex, typedText, correctWords } = testState;
 
-export default function TypingArea({
-  words,
-  currentWordIndex,
-  typedText,
-  correctWords,
-}: TypingAreaProps) {
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
       <div

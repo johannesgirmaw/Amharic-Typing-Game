@@ -1,13 +1,17 @@
 "use client";
 
-import { TestResults } from "@/types";
+import { useTypingTest } from "@/contexts/TypingTestContext";
 
-interface ResultsProps {
-  results: TestResults;
-  onRestart: () => void;
-}
+export default function Results() {
+  const { results, startTest, resetTest } = useTypingTest();
 
-export default function Results({ results, onRestart }: ResultsProps) {
+  if (!results) return null;
+
+  const handleRestart = () => {
+    resetTest();
+    setTimeout(() => startTest(), 50);
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto px-4">
       <div className="bg-gray-800 rounded-lg p-8 space-y-6">
@@ -54,7 +58,7 @@ export default function Results({ results, onRestart }: ResultsProps) {
         </div>
 
         <button
-          onClick={onRestart}
+          onClick={handleRestart}
           className="w-full bg-yellow-500 text-black font-semibold py-3 rounded-lg hover:bg-yellow-400 transition-colors"
         >
           Restart Test

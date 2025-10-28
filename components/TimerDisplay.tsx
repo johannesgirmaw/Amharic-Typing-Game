@@ -1,26 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  useTypingTest,
+  useTypingTestComputed,
+} from "@/contexts/TypingTestContext";
 
-interface TimerDisplayProps {
-  startTime: number;
-  duration: number;
-}
-
-export default function TimerDisplay({
-  startTime,
-  duration,
-}: TimerDisplayProps) {
-  const [timeLeft, setTimeLeft] = useState(duration);
+export default function TimerDisplay() {
+  const { settings, testState } = useTypingTest();
+  const { getTimeRemaining } = useTypingTestComputed();
+  const [timeLeft, setTimeLeft] = useState(settings.duration);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const elapsed = (Date.now() - startTime) / 1000;
-      setTimeLeft(Math.max(0, Math.ceil(duration - elapsed)));
-    }, 100);
+    if (testState.status === "running" && testState.startTime) {
+      const interval = setInterval(() => {
+        setTimeLeft(getTimeRemaining());
+      }, 100);
 
-    return () => clearInterval(interval);
-  }, [startTime, duration]);
+      return () => clearInterval(interval);
+    }
+  }, [testState.status, testState.startTime, getTimeRemaining]);
 
   return <p className="text-2xl font-bold">{timeLeft}s</p>;
 }
