@@ -6,7 +6,7 @@ interface TypingAreaProps {
   words: string[];
   currentWordIndex: number;
   typedText: string;
-  correctWords: boolean[];
+  correctWords: (boolean | undefined)[];
 }
 
 export default function TypingArea({

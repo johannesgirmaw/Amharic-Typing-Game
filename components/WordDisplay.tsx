@@ -5,7 +5,7 @@ interface WordDisplayProps {
   typedText: string;
   isCurrent: boolean;
   isTyped: boolean;
-  isCorrect: boolean;
+  isCorrect: boolean | undefined;
 }
 
 export default function WordDisplay({
@@ -22,10 +22,17 @@ export default function WordDisplay({
     }
 
     if (isTyped && !isCurrent) {
-      // Completed words
+      // Completed words - only show color if we've explicitly set correctWords
+      // For words that have been evaluated (completion occurred)
       return (
         <span
-          className={`word ${isCorrect ? "text-green-500" : "text-red-500"}`}
+          className={`word ${
+            isCorrect === true
+              ? "text-green-500"
+              : isCorrect === false
+              ? "text-red-500"
+              : "text-gray-400"
+          }`}
         >
           {word}
         </span>

@@ -8,6 +8,7 @@ import TimerDisplay from "@/components/TimerDisplay";
 import { getRandomWords } from "@/data/words";
 import { calculateResults } from "@/utils/calculations";
 import { TestState, TestMode, TestResults } from "@/types";
+import { convertEnglishToAmharic } from "@/utils/phoneticToAmharic";
 
 export default function Home() {
   const [settings, setSettings] = useState({
@@ -27,12 +28,13 @@ export default function Home() {
       words,
       correctChars: 0,
       incorrectChars: 0,
-      correctWords: Array(words.length).fill(false),
+      correctWords: Array(words.length).fill(undefined),
     };
   });
 
   const [results, setResults] = useState<TestResults | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleTestEnd = useCallback(() => {
     setTestState((prev) => {
@@ -81,7 +83,7 @@ export default function Home() {
       words,
       correctChars: 0,
       incorrectChars: 0,
-      correctWords: Array(words.length).fill(false),
+      correctWords: Array(words.length).fill(undefined),
     };
   };
 
@@ -91,7 +93,7 @@ export default function Home() {
       ...createInitialState(),
       status: "running",
       words,
-      correctWords: Array(words.length).fill(false),
+      correctWords: Array(words.length).fill(undefined),
       startTime: Date.now(),
     });
     setResults(null);
@@ -104,6 +106,8 @@ export default function Home() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    console.log("Key pressed:", e.key, "Code:", e.code, "KeyCode:", e.keyCode);
+
     if (e.key === "Tab" && e.shiftKey) {
       e.preventDefault();
       resetTest();
@@ -115,30 +119,66 @@ export default function Home() {
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (testState.status !== "running") {
-      startTest();
-      return;
+    const inputValue = e.target.value;
+
+    console.log("Raw input:", inputValue);
+
+    // Store raw input temporarily without resetting correctWords
+    setTestState((prev) => ({
+      ...prev,
+      typedText: inputValue,
+      // Keep existing correctWords array intact
+      correctWords: prev.correctWords,
+    }));
+
+    // Clear existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
 
-    const inputValue = e.target.value;
-    const currentWord = testState.words[testState.currentWordIndex];
-    const lastChar = inputValue[inputValue.length - 1];
-
-    if (lastChar === " ") {
-      const trimmedInput = inputValue.trim();
-      const isCorrect = trimmedInput === currentWord;
-
-      const wordLength = currentWord.length;
-      const correctChars = isCorrect ? wordLength : 0;
-      const incorrectChars = isCorrect ? 0 : wordLength;
+    // Debounce: wait 150ms before converting to allow multi-character patterns
+    debounceTimeoutRef.current = setTimeout(() => {
+      const converted = convertEnglishToAmharic(inputValue);
+      console.log("Converted:", converted);
 
       setTestState((prev) => {
+        const newState = {
+          ...prev,
+          typedText: converted,
+          correctWords: prev.correctWords,
+        };
+        // Update input field value
+        if (inputRef.current) {
+          inputRef.current.value = converted;
+        }
+        return newState;
+      });
+    }, 150); // 150ms delay to wait for multi-char combinations
+
+    // Handle space key for word completion
+    if (inputValue[inputValue.length - 1] === " ") {
+      const converted = convertEnglishToAmharic(inputValue);
+
+      setTestState((prev) => {
+        if (prev.status !== "running") {
+          startTest();
+          return prev;
+        }
+
+        const currentWord = prev.words[prev.currentWordIndex];
+        const trimmedInput = converted.trim();
+        const isCorrect = trimmedInput === currentWord;
+
+        const wordLength = currentWord.length;
+        const correctChars = isCorrect ? wordLength : 0;
+        const incorrectChars = isCorrect ? 0 : wordLength;
+
         const newCorrectWords = [...prev.correctWords];
         newCorrectWords[prev.currentWordIndex] = isCorrect;
 
         const nextIndex = prev.currentWordIndex + 1;
 
-        return {
+        const newState = {
           ...prev,
           currentWordIndex: nextIndex,
           typedText: "",
@@ -146,27 +186,25 @@ export default function Home() {
           incorrectChars: prev.incorrectChars + incorrectChars,
           correctWords: newCorrectWords,
         };
+
+        // Check if test should end
+        if (settings.mode === "words" && nextIndex >= settings.wordCount) {
+          const finalState: TestState = {
+            ...newState,
+            status: "finished",
+            endTime: Date.now(),
+          };
+          setResults(calculateResults(finalState));
+          return finalState;
+        }
+
+        return newState;
       });
 
       e.target.value = "";
-
-      setTimeout(() => {
-        setTestState((prev) => {
-          const nextIndex = prev.currentWordIndex;
-          if (settings.mode === "words" && nextIndex >= settings.wordCount) {
-            const finalState: TestState = {
-              ...prev,
-              status: "finished",
-              endTime: Date.now(),
-            };
-            setResults(calculateResults(finalState));
-            return finalState;
-          }
-          return prev;
-        });
-      }, 0);
-    } else {
-      setTestState((prev) => ({ ...prev, typedText: inputValue }));
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
     }
   };
 
@@ -216,6 +254,7 @@ export default function Home() {
               <input
                 ref={inputRef}
                 type="text"
+                inputMode="text"
                 autoFocus
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
@@ -223,6 +262,9 @@ export default function Home() {
                 onChange={() => {}}
                 className="absolute opacity-0 pointer-events-none"
                 tabIndex={-1}
+                lang="am"
+                autoComplete="off"
+                spellCheck="false"
               />
               {testState.status === "idle" && (
                 <p className="text-gray-500 text-sm">

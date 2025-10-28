@@ -15,7 +15,7 @@ export interface TestState {
   words: string[];
   correctChars: number;
   incorrectChars: number;
-  correctWords: boolean[]; // Track which words were typed correctly
+  correctWords: (boolean | undefined)[]; // Track which words were typed correctly (undefined = not yet evaluated)
 }
 
 export interface TestResults {
