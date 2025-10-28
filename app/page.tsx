@@ -33,7 +33,7 @@ export default function Home() {
           </div>
         )}
 
-        {(testState.status === "running" || testState.status === "idle") && (
+        {testState.status === "running" && (
           <>
             <TypingArea />
 
@@ -53,11 +53,6 @@ export default function Home() {
                 autoComplete="off"
                 spellCheck="false"
               />
-              {testState.status === "idle" && (
-                <p className="text-gray-500 text-sm">
-                  Click Start Test to begin
-                </p>
-              )}
               {testState.status === "running" &&
                 settings.mode === "time" &&
                 testState.startTime && <TimerDisplay />}

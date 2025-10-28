@@ -49,7 +49,7 @@ const TypingTestContext = createContext<TypingTestContextValue | undefined>(
 
 // Create initial state factory
 const createInitialState = (): TestState => {
-  const words = typeof window !== "undefined" ? getRandomWords(200) : [];
+  const words = getRandomWords(200);
   return {
     status: "idle",
     currentWordIndex: 0,
