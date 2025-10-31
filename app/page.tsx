@@ -4,6 +4,7 @@ import TestSettings from "@/components/TestSettings";
 import TypingArea from "@/components/TypingArea";
 import Results from "@/components/Results";
 import TimerDisplay from "@/components/TimerDisplay";
+import FloatingKeyboardButton from "@/components/FloatingKeyboardButton";
 import {
   useTypingTest,
   useTypingTestInput,
@@ -76,6 +77,9 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      {/* Floating Keyboard Button */}
+      <FloatingKeyboardButton />
     </main>
   );
 }
