@@ -16,6 +16,7 @@ export interface TestState {
   correctChars: number;
   incorrectChars: number;
   correctWords: (boolean | undefined)[]; // Track which words were typed correctly (undefined = not yet evaluated)
+  typedWords: (string | undefined)[]; // Store typed text for each completed word for character-by-character display
 }
 
 export interface TestResults {

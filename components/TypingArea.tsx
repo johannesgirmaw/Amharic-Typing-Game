@@ -5,7 +5,8 @@ import { useTypingTestState } from "@/contexts/TypingTestContext";
 
 export default function TypingArea() {
   const testState = useTypingTestState();
-  const { words, currentWordIndex, typedText, correctWords } = testState;
+  const { words, currentWordIndex, typedText, correctWords, typedWords } =
+    testState;
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
@@ -17,7 +18,9 @@ export default function TypingArea() {
           <WordDisplay
             key={`${word}-${index}`}
             word={word}
-            typedText={index === currentWordIndex ? typedText : ""}
+            typedText={
+              index === currentWordIndex ? typedText : typedWords[index] || ""
+            }
             isCurrent={index === currentWordIndex}
             isTyped={index < currentWordIndex}
             isCorrect={correctWords[index]}

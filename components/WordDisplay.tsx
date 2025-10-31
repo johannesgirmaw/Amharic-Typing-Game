@@ -22,8 +22,41 @@ export default function WordDisplay({
     }
 
     if (isTyped && !isCurrent) {
-      // Completed words - only show color if we've explicitly set correctWords
-      // For words that have been evaluated (completion occurred)
+      // Completed words - show character-by-character if we have typedText
+      if (typedText && typedText.length > 0) {
+        const chars = word.split("");
+        const typedChars = typedText.split("");
+
+        return (
+          <span className="word">
+            {chars.map((char, index) => {
+              const typedChar = typedChars[index];
+              let className = "";
+
+              // Character hasn't been typed yet
+              if (typedChar === undefined) {
+                className = "char-upcoming";
+              }
+              // Character matches correctly
+              else if (typedChar === char) {
+                className = "char-correct";
+              }
+              // Character doesn't match
+              else {
+                className = "char-incorrect";
+              }
+
+              return (
+                <span key={index} className={className}>
+                  {char}
+                </span>
+              );
+            })}
+          </span>
+        );
+      }
+
+      // Fallback: show color if we've explicitly set correctWords (for backwards compatibility)
       return (
         <span
           className={`word ${
@@ -49,16 +82,22 @@ export default function WordDisplay({
           const typedChar = typedChars[index];
           let className = "";
 
+          // Character hasn't been typed yet
           if (typedChar === undefined) {
-            className = "char-upcoming";
-          } else if (typedChar === char) {
+            // If it's the first untyped character, mark it as current
+            if (index === 0 || typedChars[index - 1] !== undefined) {
+              className = "char-current";
+            } else {
+              className = "char-upcoming";
+            }
+          } 
+          // Character matches correctly
+          else if (typedChar === char) {
             className = "char-correct";
-          } else {
+          } 
+          // Character doesn't match
+          else {
             className = "char-incorrect";
-          }
-
-          if (typedChars[index] === undefined && index === 0) {
-            className = "char-current";
           }
 
           return (

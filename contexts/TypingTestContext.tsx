@@ -60,6 +60,7 @@ const createInitialState = (): TestState => {
     correctChars: 0,
     incorrectChars: 0,
     correctWords: Array(words.length).fill(undefined),
+    typedWords: Array(words.length).fill(undefined),
   };
 };
 
@@ -99,6 +100,7 @@ export function TypingTestProvider({ children }: TypingTestProviderProps) {
       status: "running",
       words,
       correctWords: Array(words.length).fill(undefined),
+      typedWords: Array(words.length).fill(undefined),
       startTime: Date.now(),
     });
     setResults(null);
@@ -128,6 +130,113 @@ export function TypingTestProvider({ children }: TypingTestProviderProps) {
   const handleInput = useCallback(
     (inputValue: string) => {
       console.log("Raw input:", inputValue);
+
+      // Handle space key for word completion or character marking (check first)
+      if (inputValue[inputValue.length - 1] === " ") {
+        const converted = convertEnglishToAmharic(inputValue);
+
+        // Clear debounce since we're handling space immediately
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+          debounceTimeoutRef.current = null;
+        }
+
+        setTestState((prev) => {
+          if (prev.status !== "running") {
+            startTest();
+            return prev;
+          }
+
+          const currentWord = prev.words[prev.currentWordIndex];
+          // Use the converted input to determine current position (without the trailing space)
+          const trimmedConverted = converted.trim();
+          const currentPosition = trimmedConverted.length;
+          const currentChar = currentWord[currentPosition];
+
+          // If current character is NOT a space, mark it as incorrect and don't advance
+          if (currentChar !== undefined && currentChar !== " ") {
+            // Mark the current character as incorrect by adding a non-matching character
+            // We use a space character to mark it as incorrect (since WordDisplay compares typedChar !== char)
+            // This will make WordDisplay show the currentChar as red
+            const newTypedText = trimmedConverted + " "; // Add space to mark it incorrect
+
+            // Update input field: remove the space, keep existing typed text
+            if (inputRef.current) {
+              inputRef.current.value = trimmedConverted;
+            }
+
+            return {
+              ...prev,
+              typedText: newTypedText,
+              incorrectChars: prev.incorrectChars + 1,
+            };
+          }
+
+          // Current character IS a space, proceed normally with word completion
+          const trimmedInput = converted.trim();
+
+          // Count correct and incorrect characters character-by-character
+          const wordChars = currentWord.split("");
+          const typedChars = trimmedInput.split("");
+          let correctCount = 0;
+          let incorrectCount = 0;
+
+          // Compare character by character up to the word length
+          const maxLength = Math.max(wordChars.length, typedChars.length);
+          for (let i = 0; i < maxLength; i++) {
+            if (i < wordChars.length && i < typedChars.length) {
+              if (wordChars[i] === typedChars[i]) {
+                correctCount++;
+              } else {
+                incorrectCount++;
+              }
+            } else if (i < typedChars.length) {
+              // Extra characters typed beyond the word
+              incorrectCount++;
+            }
+          }
+
+          const isCorrect = trimmedInput === currentWord;
+
+          const newCorrectWords = [...prev.correctWords];
+          newCorrectWords[prev.currentWordIndex] = isCorrect;
+
+          // Store the typed text for this completed word so we can display it character-by-character
+          const newTypedWords = [...prev.typedWords];
+          newTypedWords[prev.currentWordIndex] = trimmedInput;
+
+          const nextIndex = prev.currentWordIndex + 1;
+
+          const newState = {
+            ...prev,
+            currentWordIndex: nextIndex,
+            typedText: "",
+            correctChars: prev.correctChars + correctCount,
+            incorrectChars: prev.incorrectChars + incorrectCount,
+            correctWords: newCorrectWords,
+            typedWords: newTypedWords,
+          };
+
+          // Clear input field for next word
+          if (inputRef.current) {
+            inputRef.current.value = "";
+          }
+
+          // Check if test should end
+          if (settings.mode === "words" && nextIndex >= settings.wordCount) {
+            const finalState: TestState = {
+              ...newState,
+              status: "finished",
+              endTime: Date.now(),
+            };
+            setResults(calculateResults(finalState));
+            return finalState;
+          }
+
+          return newState;
+        });
+        return; // Early return to skip normal input handling
+      }
 
       // Store raw input temporarily without resetting correctWords
       setTestState((prev) => ({
@@ -159,57 +268,6 @@ export function TypingTestProvider({ children }: TypingTestProviderProps) {
           return newState;
         });
       }, 150);
-
-      // Handle space key for word completion
-      if (inputValue[inputValue.length - 1] === " ") {
-        const converted = convertEnglishToAmharic(inputValue);
-
-        setTestState((prev) => {
-          if (prev.status !== "running") {
-            startTest();
-            return prev;
-          }
-
-          const currentWord = prev.words[prev.currentWordIndex];
-          const trimmedInput = converted.trim();
-          const isCorrect = trimmedInput === currentWord;
-
-          const wordLength = currentWord.length;
-          const correctChars = isCorrect ? wordLength : 0;
-          const incorrectChars = isCorrect ? 0 : wordLength;
-
-          const newCorrectWords = [...prev.correctWords];
-          newCorrectWords[prev.currentWordIndex] = isCorrect;
-
-          const nextIndex = prev.currentWordIndex + 1;
-
-          const newState = {
-            ...prev,
-            currentWordIndex: nextIndex,
-            typedText: "",
-            correctChars: prev.correctChars + correctChars,
-            incorrectChars: prev.incorrectChars + incorrectChars,
-            correctWords: newCorrectWords,
-          };
-
-          // Check if test should end
-          if (settings.mode === "words" && nextIndex >= settings.wordCount) {
-            const finalState: TestState = {
-              ...newState,
-              status: "finished",
-              endTime: Date.now(),
-            };
-            setResults(calculateResults(finalState));
-            return finalState;
-          }
-
-          return newState;
-        });
-
-        if (inputRef.current) {
-          inputRef.current.value = "";
-        }
-      }
     },
     [settings.mode, settings.wordCount, startTest]
   );
