@@ -469,14 +469,14 @@ export default function KeyboardMap({ isOpen, onClose }: KeyboardMapProps) {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/30 z-40 transition-opacity duration-300"
           onClick={onClose}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 z-50 transform transition-transform duration-300 ease-out ${
+        className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 z-50 transform transition-transform duration-300 ease-out shadow-lg ${
           isOpen ? "translate-y-0" : "translate-y-full"
         }`}
         style={{
@@ -486,11 +486,11 @@ export default function KeyboardMap({ isOpen, onClose }: KeyboardMapProps) {
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">English to Amharic Keyboard Map</h2>
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800">English to Amharic Keyboard Map</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors text-2xl leading-none"
+            className="text-gray-500 hover:text-gray-700 transition-colors text-2xl leading-none"
             aria-label="Close keyboard map"
           >
             ×
@@ -505,13 +505,13 @@ export default function KeyboardMap({ isOpen, onClose }: KeyboardMapProps) {
           </div>
 
           {/* Instructions */}
-          <div className="mb-6 p-4 bg-gray-800 rounded-lg">
-            <p className="text-sm text-gray-300 mb-2">
-              <strong>How to use:</strong> Type English phonetic sounds to get
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="text-sm text-gray-700 mb-2">
+              <strong className="text-gray-800">How to use:</strong> Type English phonetic sounds to get
               Amharic characters.
             </p>
-            <p className="text-sm text-gray-300">
-              The pattern is: <strong>Consonant + Vowel</strong> (e, a, ie/i, u,
+            <p className="text-sm text-gray-600">
+              The pattern is: <strong className="text-gray-800">Consonant + Vowel</strong> (e, a, ie/i, u,
               or o). For example: &quot;he&quot; → ሀ, &quot;ha&quot; → ሃ,
               &quot;hie&quot; → ሄ
             </p>
@@ -519,20 +519,20 @@ export default function KeyboardMap({ isOpen, onClose }: KeyboardMapProps) {
 
           {/* Special Vowels */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-gray-300">
+            <h3 className="text-lg font-semibold mb-3 text-gray-800">
               Special Vowels & Characters
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {specialMappings.map((mapping) => (
                 <div
                   key={mapping.english}
-                  className="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:border-gray-600 transition-colors"
+                  className="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-gray-400 transition-colors"
                 >
-                  <div className="text-sm text-gray-400 mb-1">
+                  <div className="text-sm text-gray-500 mb-1">
                     {mapping.english}
                   </div>
                   <div
-                    className="text-2xl font-bold"
+                    className="text-2xl font-bold text-gray-800"
                     style={{ fontFamily: "var(--font-amharic)" }}
                   >
                     {mapping.amharic}
@@ -544,29 +544,29 @@ export default function KeyboardMap({ isOpen, onClose }: KeyboardMapProps) {
 
           {/* Consonant Groups */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-gray-300">
+            <h3 className="text-lg font-semibold mb-3 text-gray-800">
               Consonant Groups
             </h3>
             <div className="space-y-4">
               {keyboardMappings.map((group) => (
                 <div
                   key={group.consonant}
-                  className="bg-gray-800 rounded-lg p-4 border border-gray-700"
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200"
                 >
-                  <h4 className="text-md font-semibold mb-3 text-yellow-400">
+                  <h4 className="text-md font-semibold mb-3 text-gray-700">
                     {group.consonant} Group
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
                     {group.mappings.map((mapping) => (
                       <div
                         key={mapping.english}
-                        className="bg-gray-900 rounded p-2 border border-gray-700 hover:border-yellow-500 transition-colors text-center"
+                        className="bg-white rounded p-2 border border-gray-300 hover:border-gray-500 transition-colors text-center"
                       >
-                        <div className="text-xs text-gray-400 mb-1">
+                        <div className="text-xs text-gray-500 mb-1">
                           {mapping.english}
                         </div>
                         <div
-                          className="text-xl font-bold"
+                          className="text-xl font-bold text-gray-800"
                           style={{ fontFamily: "var(--font-amharic)" }}
                         >
                           {mapping.amharic}

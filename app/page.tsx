@@ -15,30 +15,39 @@ export default function Home() {
   const { handleInput, handleKeyDown, inputRef } = useTypingTestInput();
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white py-12">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Amharic Typing Test</h1>
-          <p className="text-gray-400">ፍጥነቱን ለመፈተኽ ተጉዘይ</p>
+    <main className="min-h-screen bg-white text-gray-800">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Header - Minimal like monkeytype */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-semibold mb-1 text-gray-800">
+            Amharic Typing Test
+          </h1>
+          <p className="text-sm text-gray-500">ፍጥነቱን ለመፈተኽ ተጉዘይ</p>
         </div>
 
+        {/* Settings Bar - Top aligned like monkeytype */}
         {testState.status === "idle" && (
           <div className="mb-8">
             <TestSettings />
-            <button
-              onClick={startTest}
-              className="mx-auto block bg-yellow-500 text-black font-semibold px-8 py-3 rounded-lg hover:bg-yellow-400 transition-colors"
-            >
-              Start Test
-            </button>
+            <div className="text-center mt-6">
+              <button
+                onClick={startTest}
+                className="bg-gray-800 text-white font-medium px-6 py-2.5 rounded hover:bg-gray-700 transition-colors"
+              >
+                Start Test
+              </button>
+            </div>
           </div>
         )}
 
+        {/* Main Typing Area - Centered like monkeytype */}
         {testState.status === "running" && (
           <>
-            <TypingArea />
+            <div className="mb-6">
+              <TypingArea />
+            </div>
 
-            <div className="mt-8 text-center">
+            <div className="text-center">
               <input
                 ref={inputRef}
                 type="text"
@@ -58,7 +67,7 @@ export default function Home() {
                 settings.mode === "time" &&
                 testState.startTime && <TimerDisplay />}
               {testState.status === "running" && settings.mode === "words" && (
-                <p className="text-2xl font-bold">
+                <p className="text-xl font-semibold text-gray-600">
                   {testState.currentWordIndex} / {settings.wordCount}
                 </p>
               )}
@@ -68,11 +77,17 @@ export default function Home() {
 
         {testState.status === "finished" && results && <Results />}
 
-        <div className="mt-12 text-center text-sm text-gray-500">
+        {/* Footer - Minimal like monkeytype */}
+        <div className="mt-12 text-center text-xs text-gray-400">
           <p>
             Press{" "}
-            <kbd className="bg-gray-800 px-2 py-1 rounded">Tab + Enter</kbd> to
-            restart | <kbd className="bg-gray-800 px-2 py-1 rounded">Esc</kbd>{" "}
+            <kbd className="bg-gray-100 border border-gray-300 px-2 py-0.5 rounded text-gray-600">
+              Tab + Enter
+            </kbd>{" "}
+            to restart |{" "}
+            <kbd className="bg-gray-100 border border-gray-300 px-2 py-0.5 rounded text-gray-600">
+              Esc
+            </kbd>{" "}
             to reset
           </p>
         </div>

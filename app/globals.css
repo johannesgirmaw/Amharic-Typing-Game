@@ -1,11 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #1a1a1a;
-  --foreground: #e6e6e6;
-  --color-correct: #5fc365;
-  --color-incorrect: #ca4754;
-  --color-current: #e7b75f;
+  --background: #ffffff;
+  --foreground: #323232;
+  --foreground-muted: #6b6b6b;
+  --color-correct: #18e061;
+  --color-incorrect: #d14d4d;
+  --color-current: #323232;
+  --border-color: #e5e5e5;
+  --button-active: #323232;
+  --button-inactive: #f5f5f5;
 }
 
 @theme inline {
@@ -27,15 +31,21 @@ body {
 
 .char-incorrect {
   color: var(--color-incorrect);
+  text-decoration: underline;
+  text-decoration-color: var(--color-incorrect);
+  text-underline-offset: 2px;
 }
 
 .char-current {
   background-color: var(--color-current);
   color: var(--background);
+  padding: 2px 0;
+  border-radius: 2px;
 }
 
 .char-upcoming {
-  opacity: 0.5;
+  opacity: 0.4;
+  color: var(--foreground-muted);
 }
 
 /* Keyboard drawer animations */

@@ -67,17 +67,19 @@ function Key({
   return (
     <div
       onClick={() => keyValue === "shift" && onShiftToggle()}
-      className={`flex flex-col relative items-center justify-center bg-gray-700 border-2 border-gray-600 rounded-md p-2 min-h-[60px] transition-all shadow-md ${
+      className={`flex flex-col relative items-center justify-center bg-gray-100 border-2 border-gray-300 rounded-md p-2 min-h-[60px] transition-all shadow-sm ${
         width > 1 ? `col-span-${width}` : ""
       } ${
         keyValue === "shift"
-          ? "cursor-pointer bg-yellow-600 hover:bg-yellow-500"
-          : "hover:bg-gray-600 hover:border-yellow-500"
-      } ${keyValue === "shift" && shiftPressed ? "bg-yellow-600" : ""}`}
+          ? "cursor-pointer bg-gray-800 hover:bg-gray-700 text-white"
+          : "hover:bg-gray-200 hover:border-gray-400"
+      } ${keyValue === "shift" && shiftPressed ? "bg-gray-800 text-white" : ""}`}
       style={{ minWidth: `${width * 50}px` }}
     >
       <div
-        className={`text-base font-semibold text-gray-300 ${
+        className={`text-base font-semibold ${
+          keyValue === "shift" ? "text-white" : "text-gray-600"
+        } ${
           keyValue !== "shift" && "absolute top-0 left-0.5"
         }`}
       >
@@ -85,7 +87,7 @@ function Key({
       </div>
       {amharic && (
         <div
-          className="text-2xl font-bold text-yellow-400 mt-1"
+          className="text-2xl font-bold text-gray-800 mt-1"
           style={{ fontFamily: "var(--font-amharic)" }}
         >
           {shiftPressed ? amharicWithShift : amharic}
@@ -102,12 +104,12 @@ export default function KeyboardUI() {
   };
   return (
     <div className="w-full mx-auto">
-      <div className="bg-gray-900 rounded-lg p-4 sm:p-6 border border-gray-700">
+      <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200">
         <div className="mb-4 text-center">
-          <h3 className="text-lg font-semibold text-gray-300 mb-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
             English → Amharic Keyboard Map
           </h3>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600">
             Each key shows the English letter (top) and its corresponding
             Amharic character (bottom)
           </p>
@@ -164,9 +166,9 @@ export default function KeyboardUI() {
         </div>
 
         {/* Instructions */}
-        <div className="mt-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-          <p className="text-sm text-gray-300">
-            <strong>Tip:</strong> The Amharic character shown is for the
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="text-sm text-gray-700">
+            <strong className="text-gray-800">Tip:</strong> The Amharic character shown is for the
             default. Add vowels (a, e, i, u, o) after the consonant to get
             different Amharic characters. For example: &quot;he&quot; → ሀ,
             &quot;hu&quot; → ሁ, &quot;hi&quot; → ሂ, &quot;ha&quot; → ሃ,

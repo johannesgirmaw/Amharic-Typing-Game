@@ -21,5 +21,5 @@ export default function TimerDisplay() {
     }
   }, [testState.status, testState.startTime, getTimeRemaining]);
 
-  return <p className="text-2xl font-bold">{timeLeft}s</p>;
+  return <p className="text-xl font-semibold text-gray-700">{timeLeft.toFixed(1)}s</p>;
 }

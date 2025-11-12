@@ -10,42 +10,42 @@ export default function TestSettings() {
   const { settings, updateSettings } = useTypingTestSettings();
 
   return (
-    <div className="flex flex-col gap-4 mb-8">
-      {/* Mode Selection */}
-      <div className="flex gap-2 flex-wrap">
+    <div className="flex flex-col gap-3">
+      {/* Mode Selection - Horizontal bar like monkeytype */}
+      <div className="flex gap-2 flex-wrap justify-center">
         <button
           onClick={() => updateSettings({ mode: "time" })}
-          className={`px-4 py-2 rounded transition-colors ${
+          className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
             settings.mode === "time"
-              ? "bg-yellow-500 text-black font-semibold"
-              : "bg-gray-700 hover:bg-gray-600"
+              ? "bg-gray-800 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300"
           }`}
         >
-          • time
+          ⏱ time
         </button>
         <button
           onClick={() => updateSettings({ mode: "words" })}
-          className={`px-4 py-2 rounded transition-colors ${
+          className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
             settings.mode === "words"
-              ? "bg-yellow-500 text-black font-semibold"
-              : "bg-gray-700 hover:bg-gray-600"
+              ? "bg-gray-800 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300"
           }`}
         >
           A words
         </button>
       </div>
 
-      {/* Duration/Word Count Selection */}
+      {/* Duration/Word Count Selection - Horizontal bar like monkeytype */}
       {settings.mode === "time" ? (
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap justify-center">
           {timeOptions.map((time) => (
             <button
               key={time}
               onClick={() => updateSettings({ duration: time })}
-              className={`px-4 py-2 rounded transition-colors ${
+              className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
                 settings.duration === time
-                  ? "bg-yellow-500 text-black font-semibold"
-                  : "bg-gray-700 hover:bg-gray-600"
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300"
               }`}
             >
               {time}
@@ -53,15 +53,15 @@ export default function TestSettings() {
           ))}
         </div>
       ) : (
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap justify-center">
           {wordOptions.map((count) => (
             <button
               key={count}
               onClick={() => updateSettings({ wordCount: count })}
-              className={`px-4 py-2 rounded transition-colors ${
+              className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
                 settings.wordCount === count
-                  ? "bg-yellow-500 text-black font-semibold"
-                  : "bg-gray-700 hover:bg-gray-600"
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300"
               }`}
             >
               {count}

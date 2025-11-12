@@ -15,7 +15,7 @@ export default function FloatingKeyboardButton() {
       {/* Floating Button */}
       <button
         onClick={toggleKeyboard}
-        className="fixed bottom-6 right-6 z-30 bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 flex items-center gap-2"
+        className="fixed bottom-6 right-6 z-30 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 flex items-center gap-2"
         aria-label="Toggle keyboard map"
         title="Show keyboard map"
       >

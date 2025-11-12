@@ -18,7 +18,7 @@ export default function WordDisplay({
   const renderWord = () => {
     if (!isCurrent && !isTyped) {
       // Upcoming words
-      return <span className="word text-gray-500">{word}</span>;
+      return <span className="word text-gray-400">{word}</span>;
     }
 
     if (isTyped && !isCurrent) {
@@ -61,10 +61,10 @@ export default function WordDisplay({
         <span
           className={`word ${
             isCorrect === true
-              ? "text-green-500"
+              ? "text-green-600"
               : isCorrect === false
-              ? "text-red-500"
-              : "text-gray-400"
+              ? "text-red-600"
+              : "text-gray-700"
           }`}
         >
           {word}
@@ -90,11 +90,11 @@ export default function WordDisplay({
             } else {
               className = "char-upcoming";
             }
-          } 
+          }
           // Character matches correctly
           else if (typedChar === char) {
             className = "char-correct";
-          } 
+          }
           // Character doesn't match
           else {
             className = "char-incorrect";

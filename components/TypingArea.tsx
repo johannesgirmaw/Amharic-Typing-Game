@@ -9,9 +9,9 @@ export default function TypingArea() {
     testState;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4">
+    <div className="w-full max-w-5xl mx-auto px-4">
       <div
-        className="text-2xl leading-relaxed select-none wrap-break-word"
+        className="text-2xl leading-relaxed select-none wrap-break-word text-gray-800"
         style={{ fontFamily: "var(--font-amharic)" }}
       >
         {words.map((word, index) => (
