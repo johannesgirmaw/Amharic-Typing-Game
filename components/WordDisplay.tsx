@@ -61,9 +61,9 @@ export default function WordDisplay({
         <span
           className={`word ${
             isCorrect === true
-              ? "text-green-600"
+              ? "text-color-correct"
               : isCorrect === false
-              ? "text-red-600"
+              ? "text-color-incorrect"
               : "text-gray-700"
           }`}
         >
